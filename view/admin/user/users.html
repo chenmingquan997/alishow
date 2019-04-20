@@ -1,0 +1,147 @@
+{{extend '../layouts/layout.html'}}
+
+{{block 'body'}}
+ <div class="container-fluid">
+      <div class="page-title">
+        <h1>用户</h1>
+      </div>
+      <!-- 有错误信息时展示 -->
+      <!-- <div class="alert alert-danger">
+        <strong>错误！</strong>发生XXX错误
+      </div> -->
+      <div class="row">
+
+        <div class="col-md-8">
+          <div class="page-action">
+            <!-- show when multiple checked -->
+            <a id="addLayer" class="btn btn-info btn-sm" href="javascript:;">添加新管理员</a>
+            <a id="delusers" class="btn btn-danger btn-sm" href="javascript:;">批量删除</a>
+          </div>
+          <table class="table table-striped table-bordered table-hover">
+            <thead>
+               <tr>
+                <th class="text-center" width="40"><input type="checkbox"></th>
+                <th class="text-center" width="80">头像</th>
+                <th>邮箱</th>
+                <th>昵称</th>
+                <th>状态</th>
+                <th class="text-center" width="100">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+{{/block}}
+
+{{block 'js'}}
+<script type="text/javascript" src="/assets/vendors/art-template/template-web.js"></script>
+<script type="text/javascript" src="/assets/vendors/layer/layer.js"></script>
+
+<script type="text/html" id="userList">
+{#each data#}
+  <tr>
+    <td class="text-center">
+      <input type="checkbox" class="dels" value="{#$value.admin_id#}">
+    </td>
+    <td class="text-center"><img class="avatar" src="{#$value.admin_pic#}"></td>
+    <td>{#$value.admin_email#}</td>
+    <td>{#$value.admin_nickname#}</td>
+    <td>{#$value.admin_state#}</td>
+    <td class="text-center">
+      <a href="javascript:;" data="{#$value.admin_id#}" class="btn edit btn-default btn-xs">编辑</a>
+      <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
+    </td>
+  </tr>
+{#/each#}
+</script>
+
+<script type="text/javascript">
+//重定义页面模板引擎使用的定界符
+template.defaults.rules[1].test = /{#([@#]?)[ \t]*(\/?)([\w\W]*?)[ \t]*#}/;
+
+$.ajax({
+  url: '/admin/user/getUsers',
+  type: 'get',
+  cache: false,
+  dataType: 'json',
+  success: function (result) {
+    console.log(result);
+    //调用template函数
+    var str = template('userList', result);
+    $('tbody').html(str);
+  }
+})
+
+//添加新管理员按钮注册点击事件，弹出添加新管理员表单
+$('#addLayer').click(function () {
+  layer.ready(function(){ 
+    layer.open({
+      type: 2,
+      title: '添加新管理员',
+      maxmin: true,
+      area: ['800px', '500px'],
+      content: '/admin/user/adduser',
+    });
+  });
+})
+
+//获取批量删除按钮，注册点击事件
+$('#delusers').click(function () {
+  //获取所有已选中的复选框 -- 伪数组，每个单元都保存一个checkbox对象
+  var checkboxList = $('.dels:checked');
+
+  //定义一个空字符串，用来接收所有选中的checkbox的value值
+  var str = '';
+  //取出每个admin_id的值，并拼接成一个字符串 --- 1,3,4
+  //index: 数组的下标
+  //item: checkbox的DOM对象
+  checkboxList.each(function (index, item) {
+    str += item.value + ',';
+  })
+
+  //截取掉最后一个 ,   1,2,3,5,
+  str = str.slice(0, str.length-1);
+  console.log(str);  // 1,2,3,5
+
+  //发送Ajax请求并将str一起发送给后端
+  $.ajax({
+    url: '/admin/user/delusers',
+    type: 'post',
+    data: {ids: str},
+    dataType: 'json',
+    success: function (result) {
+      console.log(result);
+      alert(result.message);
+      if (result.code == 200) {
+        //location.reload();
+        
+        //循环找到每一个checkbox，再删除整行
+        checkboxList.each(function () {
+          $(this).parents('tr').remove();
+        })
+      }
+    }
+  })
+})
+
+//为每个编辑按钮注册点击事件
+$('tbody').on('click', '.edit', function () {
+  //获取当前行的admin_id
+  var admin_id = $(this).attr('data');
+
+  //制作弹出层
+  layer.open({
+    type: 2,
+    title: '编辑管理员页',
+    maxmin: true,
+    area: ['800px', '500px'],
+    content: '/admin/user/edituser?id=' + admin_id,
+  });
+})
+
+</script>
+{{/block}}

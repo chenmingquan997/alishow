@@ -1,0 +1,58 @@
+{{extend '../layouts/layout.html'}}
+
+{{block 'body'}}
+<div class="container-fluid">
+  <div class="page-title">
+    <h1>修改栏目</h1>
+  </div>
+  <!-- 有错误信息时展示 -->
+  <!-- <div class="alert alert-danger">
+    <strong>错误！</strong>发生XXX错误
+  </div> -->
+  <div class="row">
+    <div class="col-md-4">
+      <form id="mainForm">
+        <h2>编辑栏目信息</h2>
+        <div class="form-group">
+          <label for="name">编号</label>
+          <input id="name" class="form-control" value="{{cate_id}}" name="id" type="text" placeholder="栏目名称" readonly>
+        </div>
+        <div class="form-group">
+          <label for="name">名称</label>
+          <input id="name" class="form-control" value="{{cate_name}}" name="name" type="text" placeholder="栏目名称">
+        </div>
+        <div class="form-group">
+          <label for="icon">图标</label>
+          <input id="icon" class="form-control" value="{{cate_icon}}" name="icon" type="text" placeholder="图标">
+        </div>
+        <div class="form-group">
+          <button id="editBtn" class="btn btn-primary" type="button">保存修改</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{{/block}}
+
+{{block 'js'}}
+<script type="text/javascript">
+//获取保存修改按钮注册点击事件
+$('#editBtn').click(function () {
+  //发送Ajax请求并将表单数据一起发送给后端程序
+  $.ajax({
+    url: '/admin/cate/modifycate',
+    type: 'post',
+    data: $('#mainForm').serialize(),
+    dataType: 'json',
+    success: function (result) {
+      console.log(result);
+      alert(result.message);
+      //如果修改成功，跳转到列表页 /admin/cate/cate
+      if (result.code == 200) {
+        location.href = '/admin/cate/cate';
+      }
+    }
+  })
+})
+</script>
+{{/block}}

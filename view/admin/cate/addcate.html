@@ -1,0 +1,59 @@
+{{extend '../layouts/layout.html'}}
+
+{{block 'body'}}
+<div class="container-fluid">
+  <div class="page-title">
+    <h1>添加栏目</h1>
+  </div>
+  <!-- 有错误信息时展示 -->
+  <!-- <div class="alert alert-danger">
+    <strong>错误！</strong>发生XXX错误
+  </div> -->
+  <div class="row">
+    <div class="col-md-4">
+      <form id="mainForm">
+        <h2>添加新栏目</h2>
+        <div class="form-group">
+          <label for="name">名称</label>
+          <input id="name" class="form-control" name="name" type="text" placeholder="分类名称">
+        </div>
+        <div class="form-group">
+          <label for="icon">图标</label>
+          <input id="icon" class="form-control" name="icon" type="text" placeholder="图标">
+        </div>
+        <div class="form-group">
+          <button id="addBtn" class="btn btn-primary" type="button">添加</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{{/block}}
+
+{{block 'js'}}
+<script type="text/javascript">
+//获取添加按钮对象，注册点击事件
+$('#addBtn').click(function () {
+  console.log($('#mainForm').serialize());
+  //发送Ajax请求并将表单数据一起发送给后端
+  $.ajax({
+    url: '/admin/cate/addCateDeal',
+    type: 'post',
+    data: $('#mainForm').serialize(), //name=aaa&icon=bbb
+    dataType: 'json',
+    success: function (result) {
+      console.log(result);
+      //提示成功/失败
+      alert(result.message);
+      //如果成功，则跳转到栏目列表页 或者 清空表单
+      if (result.code == 200) {
+        //跳转到栏目列表页
+        //location.href = '/admin/cate/cate';
+        //清空表单
+        $('#mainForm')[0].reset();
+      }
+    }
+  })
+})
+</script>
+{{/block}}

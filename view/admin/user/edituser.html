@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Users &laquo; Admin</title>
+  <link rel="stylesheet" href="/assets/vendors/bootstrap/css/bootstrap.css">
+  <link rel="stylesheet" href="/assets/vendors/font-awesome/css/font-awesome.css">
+  <link rel="stylesheet" href="/assets/vendors/nprogress/nprogress.css">
+  <link rel="stylesheet" href="/assets/css/admin.css">
+  <script src="/assets/vendors/nprogress/nprogress.js"></script>
+  <style type="text/css">
+  .error {
+    color: red;
+  }
+  </style>
+</head>
+<body>
+  <script>NProgress.start()</script>
+
+<div class="container-fluid">
+<div class="row">
+<div class="col-md-4">
+  <form id="editForm">
+    <h2>编辑管理员</h2>
+    <div class="form-group">
+      <label for="id">编号</label>
+      <input id="id" value="{{admin_id}}" class="form-control" name="id" type="text" readonly>
+    </div>
+    <div class="form-group">
+      <label for="email">邮箱</label>
+      <input id="email" value="{{admin_email}}" class="form-control" name="email" type="email" placeholder="邮箱">
+    </div>
+    <div class="form-group">
+      <label for="nickname">昵称</label>
+      <input id="nickname" value="{{admin_nickname}}" class="form-control" name="nickname" type="text" placeholder="昵称">
+    </div>
+    <div class="form-group">
+      <label for="tel">电话</label>
+      <input id="tel" value="{{admin_tel}}" class="form-control" name="tel" type="text" placeholder="电话">
+    </div>
+    <div class="form-group">
+      <label for="state">状态</label>
+      {{if admin_state=='激活'}}
+      <input name="state" type="radio" value="激活" checked>激活
+      <input name="state" type="radio" value="禁用">禁用
+      {{else}}
+      <input name="state" type="radio" value="激活">激活
+      <input name="state" type="radio" value="禁用" checked>禁用
+      {{/if}}
+    </div>
+    <div class="form-group">
+      <button id="editBtn" class="btn btn-primary" type="button">修改</button>
+    </div>
+  </form>
+</div>
+
+
+      </div>
+    </div>
+
+  <script src="/assets/vendors/jquery/jquery.js"></script>
+  <script src="/assets/vendors/bootstrap/js/bootstrap.js"></script>
+  <script type="text/javascript" src="/assets/vendors/validate/jquery.validate.js"></script>
+  <script type="text/javascript">
+  $('#editBtn').click(function () {
+    $.ajax({
+      url: '/admin/user/modifyuser',
+      type: 'post',
+      data: $('#editForm').serialize(),
+      dataType: 'json',
+      success: function (result) {
+        console.log(result);
+        parent.layer.alert(result.message, function (index_alert) {
+          if (result.code == 200) {
+            //关闭弹出层
+            var index = parent.layer.getFrameIndex(window.name);
+            parent.layer.close(index);
+
+            //刷新父页面
+            parent.location.reload();
+          }
+
+          parent.layer.close(index_alert);
+        });
+      }
+    })
+  })
+
+  </script>
+  <script>NProgress.done()</script>
+</body>
+</html>
